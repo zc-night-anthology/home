@@ -2,42 +2,122 @@
 <html lang="ja">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Website</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            line-height: 1.6;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>ページタイトル | サイト名</title>
+  <meta name="description" content="ページの説明文（SNSカードと検索結果に使われます）">
+  <meta name="theme-color" content="#1B2A38">
 
-        h1 {
-            color: #333;
-            border-bottom: 2px solid #ccc;
-            padding-bottom: 10px;
-        }
+  <!-- 検索エンジン避け：公開して検索に載せたいときは、この1行を削除（GitHub PagesはX-Robots-Tagヘッダーを付けられないためmetaのみ） -->
+  <meta name="robots" content="noindex, nofollow, noarchive">
 
-        .section {
-            margin: 20px 0;
-        }
-    </style>
+  <!-- ファビコン -->
+  <link rel="icon" href="favicon.ico" sizes="48x48">
+  <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+
+  <!-- SNSカード（OGP / X）
+     ★ 公開URLが決まったら、下の http://www.zc-night-anthology.jp/ を実際のURLに置き換える -->
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ja_JP">
+  <meta property="og:site_name" content="サイト名">
+  <meta property="og:title" content="ページタイトル | サイト名">
+  <meta property="og:description" content="ページの説明文（SNSカードと検索結果に使われます）">
+  <meta property="og:url" content="http://www.zc-night-anthology.jp/">
+  <meta property="og:image" content="http://www.zc-night-anthology.jp/images/ogp.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="ページのイメージ画像">
+  <meta name="twitter:card" content="summary_large_image">
+  <!-- <meta name="twitter:site" content="@アカウント名"> -->
+  <meta name="twitter:title" content="ページタイトル | サイト名">
+  <meta name="twitter:description" content="ページの説明文（SNSカードと検索結果に使われます）">
+  <meta name="twitter:image" content="http://www.zc-night-anthology.jp/images/ogp.png">
+  <meta name="twitter:image:alt" content="ページのイメージ画像">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=9">
+  <link rel="stylesheet" href="css/nav.css?v=9">
 </head>
 
 <body>
-    <h1>Welcome to My Website</h1>
 
-    <div class="section">
-        <h2>About</h2>
-        <p>こちらにサイトの説明を記載してください。</p>
-    </div>
+  <canvas id="warp-bg-base"></canvas>
+  <canvas id="warp-grid-bg"></canvas>
 
-    <div class="section">
-        <h2>Contact</h2>
-        <p>連絡先情報があれば記載してください。</p>
+  <header class="site-header">
+    <a class="site-header__logo" href="./">サイト名</a>
+    <button type="button" class="site-header__toggle" id="menu-toggle" aria-expanded="false" aria-controls="site-menu"
+      aria-label="メニューを開く">
+      <span class="toggle__text" aria-hidden="true"><span
+          class="toggle__roll"><span>MENU</span><span>CLOSE</span></span></span>
+      <span class="toggle__icon" aria-hidden="true"><i></i><i></i></span>
+    </button>
+  </header>
+
+  <nav class="site-menu" id="site-menu" aria-label="メインメニュー" inert>
+    <div class="site-menu__panel">
+      <div class="site-menu__inner">
+        <ul class="site-menu__list">
+          <li><a href="./"><span class="site-menu__mask"><span class="site-menu__label"
+                  style="--i:0;--ri:3">TOP</span></span><span class="site-menu__ja" style="--i:0;--ri:3">トップ</span></a>
+          </li>
+          <li><a href="#about"><span class="site-menu__mask"><span class="site-menu__label"
+                  style="--i:1;--ri:2">ABOUT</span></span><span class="site-menu__ja"
+                style="--i:1;--ri:2">私たちについて</span></a></li>
+          <li><a href="#works"><span class="site-menu__mask"><span class="site-menu__label"
+                  style="--i:2;--ri:1">WORKS</span></span><span class="site-menu__ja" style="--i:2;--ri:1">実績</span></a>
+          </li>
+          <li><a href="#news"><span class="site-menu__mask"><span class="site-menu__label"
+                  style="--i:3;--ri:0">NEWS</span></span><span class="site-menu__ja"
+                style="--i:3;--ri:0">お知らせ</span></a></li>
+        </ul>
+        <div class="site-menu__aside">
+          <!-- シェアリンク（公開URLが決まったらコメントを外し、URLを置き換える）
+        <ul class="site-menu__share">
+          <li><a href="https://twitter.com/intent/tweet?url=https%3A%2F%2FUSERNAME.github.io%2FREPO%2F" target="_blank" rel="noopener noreferrer">X</a></li>
+          <li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2FUSERNAME.github.io%2FREPO%2F" target="_blank" rel="noopener noreferrer">Facebook</a></li>
+        </ul>
+        -->
+        </div>
+        <p class="site-menu__copy">&copy; 2026 サイト名</p>
+      </div>
     </div>
+    <div class="site-menu__shutter site-menu__shutter--top" aria-hidden="true"></div>
+    <div class="site-menu__shutter site-menu__shutter--bottom" aria-hidden="true"></div>
+    <div class="site-menu__slice" aria-hidden="true"></div>
+  </nav>
+
+  <section class="hero" id="hero">
+    <div class="hero__photo" id="hero-photo"></div>
+    <div class="hero__glass" id="hero-glass" aria-hidden="true"></div>
+    <div class="hero__lines" aria-hidden="true"></div>
+    <div class="hero__title">
+      <h1>光をすかす、<br>格子のむこう。</h1>
+      <p>サブコピーをここに入れます。</p>
+    </div>
+  </section>
+
+  <main class="content">
+    <section id="about">
+      <h2>ABOUT</h2>
+      <p>本文が入ります。</p>
+    </section>
+    <section id="works">
+      <h2>WORKS</h2>
+      <p>本文が入ります。</p>
+    </section>
+    <section id="news">
+      <h2>NEWS</h2>
+      <p>本文が入ります。</p>
+    </section>
+  </main>
+
+  <script src="js/warp-grid-background.js?v=9"></script>
+  <script src="js/hero-glass.js?v=9"></script>
+  <script src="js/nav.js?v=9"></script>
 </body>
 
 </html>

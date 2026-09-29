@@ -1,0 +1,284 @@
+/* ===== サイトメニュー（ヘッダー + 全画面オーバーレイ）=====
+   MENUボタンを押すと、ヒーローの中央に横に光る線が一瞬入り、
+   そこを境に上半分・下半分がそれぞれ上下へスライドして開く。
+   閉じるときは逆に、上下から中央へ戻ってくる。
+   ブレークポイントは style.css と同じ（699px / 1023px） */
+
+/* --- ヘッダー（常に固定） --- */
+.site-header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding:
+    calc(clamp(14px, 2.2vw, 28px) + env(safe-area-inset-top, 0px))
+    max(clamp(20px, 4vw, 48px), env(safe-area-inset-right, 0px))
+    clamp(14px, 2.2vw, 28px)
+    max(clamp(20px, 4vw, 48px), env(safe-area-inset-left, 0px));
+  color: #fff;
+  pointer-events: none; /* ボタンとロゴ以外は下の要素を触れるように */
+}
+.site-header > * { pointer-events: auto; }
+
+.site-header__logo {
+  color: inherit;
+  text-decoration: none;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  font-size: clamp(15px, 1.4vw, 18px);
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.35);
+}
+
+.site-header__toggle {
+  appearance: none;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 0;
+  cursor: pointer;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.35);
+}
+
+/* MENU ⇄ CLOSE：文字が縦にロールして入れ替わる */
+.toggle__text {
+  display: block;
+  height: 1.2em;
+  overflow: hidden;
+  font-size: 13px;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+.toggle__roll {
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.5s cubic-bezier(0.76, 0, 0.24, 1);
+}
+.toggle__roll span { display: block; height: 1.2em; }
+.is-menu-open .toggle__roll { transform: translateY(-50%); }
+
+/* 2本線 → ×印 */
+.toggle__icon { position: relative; width: 24px; height: 12px; }
+.toggle__icon i {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: currentColor;
+  transition: top 0.5s cubic-bezier(0.76, 0, 0.24, 1), transform 0.5s cubic-bezier(0.76, 0, 0.24, 1);
+}
+.toggle__icon i:nth-child(1) { top: 1px; }
+.toggle__icon i:nth-child(2) { top: 9px; }
+.is-menu-open .toggle__icon i:nth-child(1) { top: 5px; transform: rotate(45deg); }
+.is-menu-open .toggle__icon i:nth-child(2) { top: 5px; transform: rotate(-45deg); }
+
+.site-header a:focus-visible,
+.site-header button:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
+
+/* --- オーバーレイ本体 --- */
+.site-menu {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  visibility: hidden;
+  pointer-events: none;
+  opacity: 0;
+  /* 閉じるとき：シャッターが閉じ切ってから（0.7s後）、0.3sかけて全体をフェードアウトする */
+  transition: opacity 0.3s ease-out 0.7s, visibility 0s linear 1s;
+}
+.is-menu-open .site-menu {
+  visibility: visible;
+  pointer-events: auto;
+  opacity: 1;
+  transition: opacity 0s linear 0s, visibility 0s linear 0s; /* 開くときは即座に表示する */
+}
+
+/* メニュー本体（中身は最初から存在し、上下のシャッターに隠れている） */
+.site-menu__panel {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: #1B2A38;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* 上下のシャッター：中央で合わさった状態から、開くときに上下へスライドして退く */
+.site-menu__shutter {
+  position: absolute;
+  left: 0; right: 0;
+  height: 50%;
+  z-index: 3;
+  background: #1B2A38;
+  transition: transform 0.7s cubic-bezier(0.76, 0, 0.24, 1);
+  will-change: transform;
+}
+.site-menu__shutter--top    { top: 0; }
+.site-menu__shutter--bottom { bottom: 0; }
+.is-menu-open .site-menu__shutter--top {
+  transform: translateY(-100%);
+  transition-delay: 0.3s; /* 中央を横切るスライスを先に見せてから開く */
+}
+.is-menu-open .site-menu__shutter--bottom {
+  transform: translateY(100%);
+  transition-delay: 0.3s;
+}
+
+/* 中央を横切る「スライス」：開くときは右→左、閉じるときはその逆再生で左→右に進む。
+   同じ transform を、開始位置・終了位置を入れ替えて逆方向に走らせているだけなので、
+   閉じる動きは開く動きの正確な逆再生になる。 */
+.site-menu__slice {
+  position: absolute;
+  left: 0; right: 0; top: 50%;
+  height: 1px; /* 背景の格子線と同じ太さ */
+  z-index: 4;
+  pointer-events: none;
+  background: rgba(190, 205, 218, 0.3); /* 背景の格子線と同じ色 */
+  transform: translateY(-50%) translateX(120%); /* 閉じている間・閉じたあとは画面の右外（動きなし） */
+  transition: none; /* 閉じるときは動かさない */
+}
+.is-menu-open .site-menu__slice {
+  transform: translateY(-50%) translateX(-120%); /* 開いたら画面の左外まで走り抜ける */
+  transition: transform 0.35s cubic-bezier(0.65, 0, 0.35, 1) 0s; /* 開くとき：即座に右→左へ走る */
+}
+
+/* パネルの背景にも80px格子（ヒーローと同じ意匠） */
+.site-menu__panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right,  rgba(190, 205, 218, 0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(190, 205, 218, 0.1) 1px, transparent 1px);
+  background-size: 80px 80px;
+}
+
+.site-menu__inner {
+  position: relative;
+  min-height: 100%;
+  display: grid;
+  grid-template-columns: 1.7fr 1fr;
+  grid-template-rows: 1fr auto;
+  gap: clamp(24px, 4vw, 64px);
+  padding:
+    calc(clamp(88px, 12vh, 132px) + env(safe-area-inset-top, 0px))
+    max(clamp(20px, 4vw, 48px), env(safe-area-inset-right, 0px))
+    calc(clamp(20px, 3vw, 36px) + env(safe-area-inset-bottom, 0px))
+    max(clamp(20px, 4vw, 48px), env(safe-area-inset-left, 0px));
+  color: #F7F6EE;
+}
+
+/* --- メニュー項目：下から立ち上がる --- */
+.site-menu__list { list-style: none; margin: 0; padding: 0; align-self: center; }
+.site-menu__list a {
+  display: flex;
+  align-items: baseline;
+  gap: 1.2em;
+  padding: 0.04em 0;
+  color: inherit;
+  text-decoration: none;
+  transition: opacity 0.3s;
+}
+.site-menu__mask { display: block; overflow: hidden; }
+.site-menu__label {
+  display: block;
+  font-size: clamp(40px, 7.4vw, 112px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+  transform: translateY(110%);
+  /* 閉じるとき：--ri（逆順の番号）が小さいほど早く隠れる＝後から立ち上がった項目ほど先に沈む */
+  transition: transform 0.35s cubic-bezier(0.76, 0, 0.24, 1) calc(var(--ri, 0) * 0.06s);
+}
+.is-menu-open .site-menu__label {
+  transform: none;
+  transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) calc(0.5s + var(--i, 0) * 0.07s);
+}
+.site-menu__ja {
+  font-size: clamp(11px, 1.1vw, 14px);
+  letter-spacing: 0.1em;
+  opacity: 0;
+  transition: opacity 0.25s calc(var(--ri, 0) * 0.06s);
+}
+.is-menu-open .site-menu__ja {
+  opacity: 0.65;
+  transition: opacity 0.6s calc(0.8s + var(--i, 0) * 0.07s);
+}
+/* ホバー中の項目以外を薄くする */
+@media (hover: hover) {
+  .site-menu__list:hover a { opacity: 0.3; }
+  .site-menu__list a:hover { opacity: 1; }
+}
+.site-menu a:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
+
+/* --- 右カラム：言語切替・シェア／下段：コピーライト --- */
+.site-menu__aside,
+.site-menu__copy {
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.is-menu-open .site-menu__aside,
+.is-menu-open .site-menu__copy { opacity: 1; transition: opacity 0.6s 1s; }
+
+.site-menu__aside { align-self: end; }
+.site-menu__share {
+  display: flex;
+  gap: 1.4em;
+  list-style: none;
+  margin: 0 0 1.6em;
+  padding: 0;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+.site-menu__share a {
+  color: inherit;
+  text-decoration: none;
+  opacity: 0.6;
+  padding-bottom: 2px;
+  border-bottom: 1px solid transparent;
+  transition: opacity 0.3s;
+}
+.site-menu__share a:hover { opacity: 1; }
+.site-menu__copy { grid-column: 1 / -1; margin: 0; font-size: 12px; letter-spacing: 0.08em; color: rgba(247, 246, 238, 0.6); }
+
+/* メニュー表示中は背面のスクロールを止める */
+html.is-menu-open,
+html.is-menu-open body { overflow: hidden; }
+
+/* ===== ブレークポイント ===== */
+@media (max-width: 1023px) {
+  .site-menu__panel::before { background-size: 64px 64px; }
+}
+@media (max-width: 699px) {
+  .site-menu__panel::before { background-size: 48px 48px; }
+  .site-menu__inner { grid-template-columns: 1fr; grid-template-rows: 1fr auto auto; }
+  .site-menu__label { font-size: clamp(34px, 11vw, 56px); }
+  .site-menu__list a { gap: 0.9em; }
+  .site-menu__aside { align-self: start; }
+}
+/* 高さが足りない画面（スマホ横向きなど） */
+@media (max-height: 520px) and (orientation: landscape) {
+  .site-menu__inner { padding-top: calc(72px + env(safe-area-inset-top, 0px)); }
+  .site-menu__label { font-size: clamp(26px, 9vh, 48px); }
+  .site-menu__share { margin-bottom: 0.8em; }
+}
+
+/* 動きを減らす設定：スライドやフラッシュをやめ、フェードだけにする */
+@media (prefers-reduced-motion: reduce) {
+  .site-menu { transition-delay: 0.25s; }
+  .is-menu-open .site-menu { transition-delay: 0s; }
+  .site-menu__shutter, .site-menu__slice { display: none; }
+  .site-menu__panel { opacity: 0; transition: opacity 0.2s linear; }
+  .is-menu-open .site-menu__panel { opacity: 1; }
+  .site-menu__label, .is-menu-open .site-menu__label { transform: none; transition: none; }
+  .site-menu__ja, .is-menu-open .site-menu__ja { opacity: 0.65; transition: none; }
+  .toggle__roll, .toggle__icon i { transition: none; }
+}

@@ -1,0 +1,240 @@
+/* ===== ベース ===== */
+html { background: #1B2A38; overflow-x: hidden; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body {
+  margin: 0;
+  color: #F7F6EE;
+  font-family: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; }
+
+/* ページ内リンクで固定ヘッダーに見出しが隠れないようにする */
+html { scroll-padding-top: 72px; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+
+/* ===== 歪みグリッド背景 =====
+   ページと一緒にスクロールさせるため absolute にする（fixed だと歪みが見えない） */
+#warp-bg-base,
+#warp-grid-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* ===== ヒーロー =====
+   高さは JS が「80pxの倍数」に調整します（格子線を背景と揃えるため） */
+.hero {
+  --u: 80px; /* JSが CONFIG.spacing に合わせて上書き */
+  position: relative;
+  height: 100vh;
+  height: 100svh; /* スマホのアドレスバーを考慮（実際の高さはJSが確定） */
+  overflow: hidden;
+  background: #1B2A38;
+}
+
+/* z-index 0 相当：写真。差し替えはここの url() だけ */
+.hero__photo {
+  position: absolute;
+  inset: -40% 0 0 0; /* 上に余白を持たせ、パララックスで隙間が出ないようにする */
+  background: url("../images/hero.svg") center / cover no-repeat;
+  will-change: transform;
+}
+
+/* すりガラスの正方形（JSが生成） */
+.hero__glass { position: absolute; top: 0; left: 0; display: grid; }
+.hero__glass .glass {
+  background: rgba(255, 255, 255, 0.14);
+  -webkit-backdrop-filter: blur(14px) saturate(1.3);
+  backdrop-filter: blur(14px) saturate(1.3);
+}
+
+/* 格子線（歪みグリッドと同じ間隔・色） */
+.hero__lines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right,  rgba(190, 205, 218, 0.3) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(190, 205, 218, 0.3) 1px, transparent 1px);
+  background-size: var(--u) var(--u);
+}
+
+.hero__title {
+  position: absolute;
+  left: max(clamp(20px, 5vw, 64px), env(safe-area-inset-left, 0px));
+  right: max(clamp(20px, 5vw, 64px), env(safe-area-inset-right, 0px));
+  bottom: calc(clamp(28px, 8vh, 72px) + env(safe-area-inset-bottom, 0px));
+  color: #fff;
+  pointer-events: none;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.35);
+}
+.hero__title h1 { margin: 0; font-size: clamp(34px, 7vw, 88px); line-height: 1.1; font-weight: 700; letter-spacing: 0.02em; }
+.hero__title p  { margin: 0.8em 0 0; font-size: clamp(13px, 1.6vw, 17px); max-width: 32em; }
+
+/* ===== コンテンツ =====
+   歪みは「ヒーロー下2画面分」あとから始まるため、ページ全体で約4.5画面以上の高さが必要です */
+.content {
+  position: relative;
+  z-index: 1;
+  padding: 8vh 8vw 30vh;
+  min-height: 360vh; /* 実コンテンツが十分長ければ不要 */
+}
+.content h2 { font-size: clamp(56px, 9vw, 132px); font-weight: 700; margin: 0; line-height: 0.94; letter-spacing: 0.01em; }
+.content p  { max-width: 38em; line-height: 1.9; color: rgba(247, 246, 238, 0.75); margin: 0 0 1em; }
+
+/* ===== ブレークポイント =====
+   1024px以上：PC / 700〜1023px：タブレット / 699px以下：スマホ
+   ※ JS側（warp-grid-background.js の WARP_BREAKPOINTS）と数値を合わせること */
+@media (min-width: 1600px) {
+  .content { padding-left: 12vw; padding-right: 12vw; }
+}
+
+@media (max-width: 1023px) {
+  .content { padding: 8vh 6vw 26vh; }
+  .hero__title p { max-width: 28em; }
+}
+
+@media (max-width: 699px) {
+  .content { padding: 6vh 6vw 20vh; }
+  .content p { line-height: 1.85; }
+  .hero__title h1 { font-size: clamp(30px, 9.5vw, 44px); line-height: 1.2; }
+  .hero__title p { font-size: 13px; line-height: 1.7; }
+  /* ぼかしは負荷が高いのでスマホでは弱める */
+  .hero__glass .glass {
+    -webkit-backdrop-filter: blur(10px) saturate(1.3);
+    backdrop-filter: blur(10px) saturate(1.3);
+  }
+}
+
+/* スマホの横向きなど、高さが足りない画面 */
+@media (max-height: 520px) and (orientation: landscape) {
+  .hero__title { bottom: calc(20px + env(safe-area-inset-bottom, 0px)); }
+  .hero__title h1 { font-size: clamp(24px, 8vh, 44px); }
+  .hero__title p { font-size: 12px; margin-top: 0.4em; }
+}
+
+/* ページ内セクション（メニューのアンカー先） */
+.content section { min-height: 80vh; padding-top: 6vh; }
+.content section + section { margin-top: 14vh; padding-top: 6vh; border-top: 1px solid rgba(247, 246, 238, 0.12); }
+
+/* ===== セクション共通レイアウト：見出し（大）＋本文（小）の2カラム =====
+   ジャンプ率（文字サイズの対比）を高くして、見出しだけで場面が変わったと分かるようにする */
+.section-grid {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(0, 1.7fr);
+  gap: clamp(24px, 6vw, 96px);
+  align-items: start;
+}
+.section-grid__head {
+  position: sticky;
+  top: calc(72px + 6vh);
+}
+.section-grid__head .section-label {
+  display: block;
+  font-size: clamp(12px, 1.2vw, 14px);
+  letter-spacing: 0.2em;
+  opacity: 0.5;
+  margin-bottom: 1em;
+  font-variant-numeric: tabular-nums;
+}
+.section-grid__body { padding-top: clamp(10px, 1.4vw, 22px); }
+.section-grid__body > p {
+  font-size: clamp(14px, 1.05vw, 16px);
+  line-height: 2;
+  color: rgba(247, 246, 238, 0.75);
+  max-width: 32em;
+  margin: 0 0 1.8em;
+}
+.section-grid__body > p:last-child { margin-bottom: 0; }
+
+/* ===== MEMBER：10名を3カラム・中央ぞろえで並べる ===== */
+.member-grid {
+  list-style: none;
+  margin: clamp(48px, 7vh, 88px) 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(28px, 3.6vw, 56px) clamp(24px, 3.2vw, 48px);
+}
+.member-card {
+  width: calc((100% - clamp(48px, 6.4vw, 96px)) / 3);
+  max-width: 260px;
+  text-align: center;
+}
+.member-card__photo {
+  aspect-ratio: 1 / 1;
+  background: rgba(247, 246, 238, 0.05);
+  border: 1px solid rgba(247, 246, 238, 0.18);
+  margin: 0 0 1.1em;
+  overflow: hidden;
+}
+.member-card__photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.member-card__name {
+  margin: 0 0 0.3em;
+  font-size: clamp(14px, 1.2vw, 17px);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+.member-card__role {
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  opacity: 0.5;
+}
+
+/* ===== NEWS：リスト形式 ===== */
+.news-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid rgba(247, 246, 238, 0.15);
+}
+.news-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: clamp(14px, 2.6vw, 32px);
+  padding: clamp(18px, 2.6vw, 30px) 0;
+  border-bottom: 1px solid rgba(247, 246, 238, 0.15);
+}
+.news-list time {
+  flex: 0 0 auto;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  opacity: 0.5;
+  font-variant-numeric: tabular-nums;
+}
+.news-list .news-tag {
+  flex: 0 0 auto;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  padding: 0.4em 0.9em;
+  border: 1px solid rgba(247, 246, 238, 0.35);
+  border-radius: 999px;
+  opacity: 0.7;
+}
+.news-list p {
+  flex: 1 1 100%;
+  margin: 0;
+  font-size: clamp(14px, 1.05vw, 16px);
+  line-height: 1.85;
+  color: rgba(247, 246, 238, 0.85);
+}
+
+/* ===== セクション用ブレークポイント ===== */
+@media (max-width: 1023px) {
+  .section-grid { grid-template-columns: minmax(140px, 0.9fr) minmax(0, 1fr); }
+  .member-card { width: calc((100% - clamp(24px, 5vw, 48px)) / 2); }
+}
+@media (max-width: 699px) {
+  .content section + section { margin-top: 10vh; }
+  .section-grid { grid-template-columns: 1fr; gap: clamp(20px, 6vw, 32px); }
+  .section-grid__head { position: static; }
+  .content h2 { font-size: clamp(44px, 15vw, 72px); }
+  .member-grid { gap: 28px 20px; }
+  .member-card { width: calc((100% - 20px) / 2); max-width: none; }
+  .news-list li { gap: 10px 20px; }
+  .news-list time { font-size: 12px; }
+}

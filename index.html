@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>ページタイトル | サイト名</title>
-  <meta name="description" content="ページの説明文（SNSカードと検索結果に使われます）">
+  <title>引き合う、あわいの夜のふち</title>
+  <meta name="description" content="『引き合う、あわいの夜のふち』はZhongli×Tartagliaのオンリーアンソロジーです。">
   <meta name="theme-color" content="#1B2A38">
 
   <!-- 検索エンジン避け：公開して検索に載せたいときは、この1行を削除（GitHub PagesはX-Robots-Tagヘッダーを付けられないためmetaのみ） -->
@@ -16,30 +16,29 @@
   <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
 
-  <!-- SNSカード（OGP / X）
-     ★ 公開URLが決まったら、下の http://www.zc-night-anthology.jp/ を実際のURLに置き換える -->
+  <!-- SNSカード（OGP / X） -->
   <meta property="og:type" content="website">
   <meta property="og:locale" content="ja_JP">
-  <meta property="og:site_name" content="サイト名">
-  <meta property="og:title" content="ページタイトル | サイト名">
-  <meta property="og:description" content="ページの説明文（SNSカードと検索結果に使われます）">
-  <meta property="og:url" content="http://www.zc-night-anthology.jp/">
-  <meta property="og:image" content="http://www.zc-night-anthology.jp/images/ogp.png">
+  <meta property="og:site_name" content="引き合う、あわいの夜のふち">
+  <meta property="og:title" content="引き合う、あわいの夜のふち">
+  <meta property="og:description" content="『引き合う、あわいの夜のふち』はZhongli×Tartagliaのオンリーアンソロジーです。">
+  <meta property="og:url" content="https://www.zc-night-anthology.jp/">
+  <meta property="og:image" content="https://www.zc-night-anthology.jp/images/ogp.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="ページのイメージ画像">
   <meta name="twitter:card" content="summary_large_image">
   <!-- <meta name="twitter:site" content="@アカウント名"> -->
-  <meta name="twitter:title" content="ページタイトル | サイト名">
-  <meta name="twitter:description" content="ページの説明文（SNSカードと検索結果に使われます）">
-  <meta name="twitter:image" content="http://www.zc-night-anthology.jp/images/ogp.png">
+  <meta name="twitter:title" content="引き合う、あわいの夜のふち">
+  <meta name="twitter:description" content="『引き合う、あわいの夜のふち』はZhongli×Tartagliaのオンリーアンソロジーです。">
+  <meta name="twitter:image" content="https://www.zc-night-anthology.jp/images/ogp.png">
   <meta name="twitter:image:alt" content="ページのイメージ画像">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=9">
-  <link rel="stylesheet" href="css/nav.css?v=9">
+  <link rel="stylesheet" href="css/style.css?v=10">
+  <link rel="stylesheet" href="css/nav.css?v=10">
 </head>
 
 <body>
@@ -48,7 +47,7 @@
   <canvas id="warp-grid-bg"></canvas>
 
   <header class="site-header">
-    <a class="site-header__logo" href="./">サイト名</a>
+    <a class="site-header__logo" href="./">ZC NIGHT ANTHOLOGY</a>
     <button type="button" class="site-header__toggle" id="menu-toggle" aria-expanded="false" aria-controls="site-menu"
       aria-label="メニューを開く">
       <span class="toggle__text" aria-hidden="true"><span
@@ -61,28 +60,24 @@
     <div class="site-menu__panel">
       <div class="site-menu__inner">
         <ul class="site-menu__list">
-          <li><a href="./"><span class="site-menu__mask"><span class="site-menu__label"
-                  style="--i:0;--ri:3">TOP</span></span><span class="site-menu__ja" style="--i:0;--ri:3">トップ</span></a>
-          </li>
           <li><a href="#about"><span class="site-menu__mask"><span class="site-menu__label"
-                  style="--i:1;--ri:2">ABOUT</span></span><span class="site-menu__ja"
-                style="--i:1;--ri:2">私たちについて</span></a></li>
-          <li><a href="#works"><span class="site-menu__mask"><span class="site-menu__label"
-                  style="--i:2;--ri:1">WORKS</span></span><span class="site-menu__ja" style="--i:2;--ri:1">実績</span></a>
-          </li>
+                  style="--i:0;--ri:2">ABOUT</span></span><span class="site-menu__ja"
+                style="--i:0;--ri:2">このアンソロジーについて</span></a></li>
+          <li><a href="#member"><span class="site-menu__mask"><span class="site-menu__label"
+                  style="--i:1;--ri:1">MEMBER</span></span><span class="site-menu__ja"
+                style="--i:1;--ri:1">参加メンバー</span></a></li>
           <li><a href="#news"><span class="site-menu__mask"><span class="site-menu__label"
-                  style="--i:3;--ri:0">NEWS</span></span><span class="site-menu__ja"
-                style="--i:3;--ri:0">お知らせ</span></a></li>
+                  style="--i:2;--ri:0">NEWS</span></span><span class="site-menu__ja"
+                style="--i:2;--ri:0">お知らせ</span></a></li>
         </ul>
         <div class="site-menu__aside">
           <!-- シェアリンク（公開URLが決まったらコメントを外し、URLを置き換える）
         <ul class="site-menu__share">
-          <li><a href="https://twitter.com/intent/tweet?url=https%3A%2F%2FUSERNAME.github.io%2FREPO%2F" target="_blank" rel="noopener noreferrer">X</a></li>
-          <li><a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2FUSERNAME.github.io%2FREPO%2F" target="_blank" rel="noopener noreferrer">Facebook</a></li>
+          <li><a href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fwww.zc-night-anthology.jp%2F" target="_blank" rel="noopener noreferrer">X</a></li>
         </ul>
         -->
         </div>
-        <p class="site-menu__copy">&copy; 2026 サイト名</p>
+        <p class="site-menu__copy">&copy; 2026 引き合う、あわいの夜のふち</p>
       </div>
     </div>
     <div class="site-menu__shutter site-menu__shutter--top" aria-hidden="true"></div>
@@ -96,28 +91,130 @@
     <div class="hero__lines" aria-hidden="true"></div>
     <div class="hero__title">
       <h1>光をすかす、<br>格子のむこう。</h1>
-      <p>サブコピーをここに入れます。</p>
+      <p>引き合う、あわいの夜のふち</p>
     </div>
   </section>
 
   <main class="content">
+
+    <!-- ===== ABOUT ===== -->
     <section id="about">
-      <h2>ABOUT</h2>
-      <p>本文が入ります。</p>
+      <div class="section-grid">
+        <div class="section-grid__head">
+          <span class="section-label">01</span>
+          <h2>ABOUT</h2>
+        </div>
+        <div class="section-grid__body">
+          <!-- ★ 本文はダミーです。実際の紹介文に差し替えてください -->
+          <p>ここに本文が入ります。<br>ここに本文が入ります。</p>
+          <p>ここに本文が入ります。<br>ここに本文が入ります。<br>ここに本文が入ります。</p>
+          <p>ここに本文が入ります。<br>ここに本文が入ります。</p>
+        </div>
+      </div>
     </section>
-    <section id="works">
-      <h2>WORKS</h2>
-      <p>本文が入ります。</p>
+
+    <!-- ===== MEMBER ===== -->
+    <section id="member">
+      <div class="section-grid">
+        <div class="section-grid__head">
+          <span class="section-label">02</span>
+          <h2>MEMBER</h2>
+        </div>
+        <div class="section-grid__body">
+          <p>参加メンバーの紹介文がここに入ります。</p>
+        </div>
+      </div>
+
+      <!-- ★ 10名分のダミーです。名前・肩書き・画像を差し替えてください -->
+      <ul class="member-grid">
+        <li class="member-card">
+          <div class="member-card__photo"></div>
+          <p class="member-card__name">MEMBER 01</p>
+          <p class="member-card__role">ここに肩書き</p>
+        </li>
+        <li class="member-card">
+          <div class="member-card__photo"></div>
+          <p class="member-card__name">MEMBER 02</p>
+          <p class="member-card__role">ここに肩書き</p>
+        </li>
+        <li class="member-card">
+          <div class="member-card__photo"></div>
+          <p class="member-card__name">MEMBER 03</p>
+          <p class="member-card__role">ここに肩書き</p>
+        </li>
+        <li class="member-card">
+          <div class="member-card__photo"></div>
+          <p class="member-card__name">MEMBER 04</p>
+          <p class="member-card__role">ここに肩書き</p>
+        </li>
+        <li class="member-card">
+          <div class="member-card__photo"></div>
+          <p class="member-card__name">MEMBER 05</p>
+          <p class="member-card__role">ここに肩書き</p>
+        </li>
+        <li class="member-card">
+          <div class="member-card__photo"></div>
+          <p class="member-card__name">MEMBER 06</p>
+          <p class="member-card__role">ここに肩書き</p>
+        </li>
+        <li class="member-card">
+          <div class="member-card__photo"></div>
+          <p class="member-card__name">MEMBER 07</p>
+          <p class="member-card__role">ここに肩書き</p>
+        </li>
+        <li class="member-card">
+          <div class="member-card__photo"></div>
+          <p class="member-card__name">MEMBER 08</p>
+          <p class="member-card__role">ここに肩書き</p>
+        </li>
+        <li class="member-card">
+          <div class="member-card__photo"></div>
+          <p class="member-card__name">MEMBER 09</p>
+          <p class="member-card__role">ここに肩書き</p>
+        </li>
+        <li class="member-card">
+          <div class="member-card__photo"></div>
+          <p class="member-card__name">MEMBER 10</p>
+          <p class="member-card__role">ここに肩書き</p>
+        </li>
+      </ul>
     </section>
+
+    <!-- ===== NEWS ===== -->
     <section id="news">
-      <h2>NEWS</h2>
-      <p>本文が入ります。</p>
+      <div class="section-grid">
+        <div class="section-grid__head">
+          <span class="section-label">03</span>
+          <h2>NEWS</h2>
+        </div>
+        <div class="section-grid__body">
+          <!-- ★ 以下はダミーの記事です。日付・タグ・本文を差し替えてください -->
+          <ul class="news-list">
+            <li>
+              <time datetime="2026-09-29">2026.09.29</time>
+              <span class="news-tag">NEWS</span>
+              <p>お知らせの本文がここに入ります。</p>
+            </li>
+            <li>
+              <time datetime="2026-08-01">2026.08.01</time>
+              <span class="news-tag">お知らせ</span>
+              <p>お知らせの本文がここに入ります。</p>
+            </li>
+            <li>
+              <time datetime="2026-07-01">2026.07.01</time>
+              <span class="news-tag">お知らせ</span>
+              <p>お知らせの本文がここに入ります。</p>
+            </li>
+          </ul>
+        </div>
+      </div>
     </section>
+
   </main>
 
-  <script src="js/warp-grid-background.js?v=9"></script>
-  <script src="js/hero-glass.js?v=9"></script>
-  <script src="js/nav.js?v=9"></script>
+  <script src="js/warp-grid-background.js?v=10"></script>
+  <script src="js/hero-glass.js?v=10"></script>
+  <script src="js/nav.js?v=10"></script>
 </body>
 
 </html>

@@ -3,12 +3,12 @@
  * ヒーロー写真の上に、格子に揃えた「大きさ違いの正方形」を敷き詰め、
  * その一部にだけすりガラス効果（.glass）を付ける。
  *
- * パララックス：
- * - 写真（.hero__photo）は完全に固定（動かさない）
- * - すりガラスの正方形（.hero__glass）と、格子線（.hero__lines）が
- *   ひとつの層として一緒に動く
- * - スクロール位置に直接追従させず、毎フレーム少しずつ近づける
- *   （lerp）ことで、慣性のかかった滑らかな動きにする
+ * スクロールに応じて起きること：
+ * - 写真（.hero__photo）：中心を軸にゆっくり拡大（ズーム）していく
+ * - すりガラスの正方形（.hero__glass）と格子線（.hero__lines）：
+ *   同じ量だけ上に動く（写真とは別レイヤーとして、少し速く動くことで奥行きを出す）
+ * - どちらも、スクロール位置に直接ではなく、毎フレーム少しずつ近づける（lerp）
+ *   ことで、慣性のかかった滑らかな動きにする
  *
  * 依存：warp-grid-background.js（CONFIG.spacing を読むため、先に読み込むこと）
  */
@@ -27,9 +27,10 @@
   const MAX_SIZE_DESKTOP = 4;               // 正方形の最大サイズ（マス数）
   const MAX_SIZE_MOBILE  = 3;
   const MOBILE_WIDTH     = 700;             // これ未満をモバイル扱い
-  const PARALLAX_SPEED   = 0.9;             // グリッド＋すりガラス層の動く速さ（写真は0＝完全固定）
+  const PARALLAX_SPEED   = 0.9;             // グリッド＋すりガラス層の動く速さ
   const PARALLAX_RANGE   = 1.4;             // ヒーロー高さの何倍スクロールするまで効かせるか
   const PARALLAX_EASE    = 0.07;            // 目標値への近づき方（小さいほどゆっくり・滑らか）
+  const PHOTO_ZOOM       = 0.8;             // 写真がヒーロー内で最大どれだけ拡大するか（0.8 = 80%）
 
   // 格子の間隔は歪みグリッドと必ず同じ値にする（画面幅に応じて CONFIG.spacing が変わる）
   function getU() {
@@ -44,11 +45,17 @@
   let rafId = null;
 
   function render(y) {
+    const maxY = hero.offsetHeight * PARALLAX_RANGE;
+    const t = maxY > 0 ? Math.min(y / maxY, 1) : 0; // 0〜1の進み具合
+
+    // 写真：中心を軸にゆっくり拡大
+    photo.style.transform = `scale(${(1 + t * PHOTO_ZOOM).toFixed(4)})`;
+
     // すりガラスの正方形：transformで層ごと動かす（あらかじめ足した予備の行で隙間を防ぐ）
     const glassOffset = bufferRows * U - y * PARALLAX_SPEED;
     layer.style.transform = `translate3d(0, ${glassOffset.toFixed(1)}px, 0)`;
 
-    // 格子線：繰り返し背景なので、位置をずらすだけで隙間なく動かせる
+    // 格子線：繰り返し背景なので、位置をずらすだけで隙間なく同じ量だけ動かせる
     lines.style.backgroundPosition = `0 ${(-y * PARALLAX_SPEED).toFixed(1)}px`;
   }
 
@@ -150,6 +157,5 @@
     }, 200);
   });
 
-  // グリッド＋すりガラス層だけをパララックスで動かす（写真は固定のまま）
   window.addEventListener('scroll', setTarget, { passive: true });
 })();

@@ -1,7 +1,14 @@
 /**
  * Hero Glass
- * ヒーロー写真の上に、80px格子に揃えた「大きさ違いの正方形」を敷き詰め、
- * その一部にだけすりガラス効果（.glass）を付ける。写真だけ緩くパララックス。
+ * ヒーロー写真の上に、格子に揃えた「大きさ違いの正方形」を敷き詰め、
+ * その一部にだけすりガラス効果（.glass）を付ける。
+ *
+ * パララックス：
+ * - 写真（.hero__photo）は完全に固定（動かさない）
+ * - すりガラスの正方形（.hero__glass）と、格子線（.hero__lines）が
+ *   ひとつの層として一緒に動く
+ * - スクロール位置に直接追従させず、毎フレーム少しずつ近づける
+ *   （lerp）ことで、慣性のかかった滑らかな動きにする
  *
  * 依存：warp-grid-background.js（CONFIG.spacing を読むため、先に読み込むこと）
  */
@@ -9,7 +16,10 @@
   const hero  = document.getElementById('hero');
   const photo = document.getElementById('hero-photo');
   const layer = document.getElementById('hero-glass');
-  if (!hero || !photo || !layer) return;
+  const lines = document.getElementById('hero-lines');
+  if (!hero || !photo || !layer || !lines) return;
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // --- 調整用 ---
   const GLASS_RATIO_DESKTOP = 0.34;         // すりガラスになるマスの割合（0〜1）
@@ -17,14 +27,57 @@
   const MAX_SIZE_DESKTOP = 4;               // 正方形の最大サイズ（マス数）
   const MAX_SIZE_MOBILE  = 3;
   const MOBILE_WIDTH     = 700;             // これ未満をモバイル扱い
-  const PARALLAX_SPEED   = 0.35;            // 写真の動き（0で固定、1でページと同じ）
+  const PARALLAX_SPEED   = 0.9;             // グリッド＋すりガラス層の動く速さ（写真は0＝完全固定）
+  const PARALLAX_RANGE   = 1.4;             // ヒーロー高さの何倍スクロールするまで効かせるか
+  const PARALLAX_EASE    = 0.07;            // 目標値への近づき方（小さいほどゆっくり・滑らか）
 
   // 格子の間隔は歪みグリッドと必ず同じ値にする（画面幅に応じて CONFIG.spacing が変わる）
   function getU() {
     if (typeof applyWarpBreakpoint === 'function') applyWarpBreakpoint();
-    return (typeof CONFIG !== 'undefined' && CONFIG.spacing) ? CONFIG.spacing : 80;
+    return (typeof CONFIG !== 'undefined' && CONFIG.spacing) ? CONFIG.spacing : 96;
   }
   let U = getU();
+  let bufferRows = 0; // すりガラス層の上に足しておく「見えない予備の行」の数
+
+  let targetY = 0;   // スクロール位置から求めた「目標」の進み具合
+  let currentY = 0;  // 実際に描画に使う、少し遅れて追いつく値
+  let rafId = null;
+
+  function render(y) {
+    // すりガラスの正方形：transformで層ごと動かす（あらかじめ足した予備の行で隙間を防ぐ）
+    const glassOffset = bufferRows * U - y * PARALLAX_SPEED;
+    layer.style.transform = `translate3d(0, ${glassOffset.toFixed(1)}px, 0)`;
+
+    // 格子線：繰り返し背景なので、位置をずらすだけで隙間なく動かせる
+    lines.style.backgroundPosition = `0 ${(-y * PARALLAX_SPEED).toFixed(1)}px`;
+  }
+
+  function tick() {
+    currentY += (targetY - currentY) * PARALLAX_EASE;
+    render(currentY);
+    if (Math.abs(targetY - currentY) > 0.05) {
+      rafId = requestAnimationFrame(tick);
+    } else {
+      currentY = targetY;
+      render(currentY);
+      rafId = null;
+    }
+  }
+
+  function requestTick() {
+    if (rafId === null) rafId = requestAnimationFrame(tick);
+  }
+
+  function setTarget() {
+    const maxY = hero.offsetHeight * PARALLAX_RANGE;
+    targetY = Math.min(window.scrollY, maxY);
+    if (reduceMotion) {
+      currentY = targetY;
+      render(currentY);
+    } else {
+      requestTick();
+    }
+  }
 
   function build() {
     U = getU();
@@ -32,12 +85,20 @@
     const W = hero.clientWidth;
     const vw = window.innerWidth;
     const cols = Math.ceil(W / U);
-    const rows = Math.ceil(window.innerHeight / U);
+    const visibleRows = Math.ceil(window.innerHeight / U);
     const isMobile = vw < MOBILE_WIDTH;
     const maxS = isMobile ? MAX_SIZE_MOBILE : MAX_SIZE_DESKTOP;
     const ratio = isMobile ? GLASS_RATIO_MOBILE : GLASS_RATIO_DESKTOP;
 
-    hero.style.height = rows * U + 'px'; // 格子線とぴったり揃える
+    hero.style.height = visibleRows * U + 'px'; // 格子線とぴったり揃える
+
+    // すりガラス層は、動かしても上端・下端に隙間が出ないよう、
+    // 見える範囲より上に予備の行を足しておく
+    const maxShift = hero.offsetHeight * PARALLAX_RANGE * PARALLAX_SPEED;
+    bufferRows = Math.ceil(maxShift / U) + 1;
+    const rows = visibleRows + bufferRows;
+
+    layer.style.top = -(bufferRows * U) + 'px';
     layer.style.gridTemplateColumns = `repeat(${cols}, ${U}px)`;
     layer.style.gridTemplateRows = `repeat(${rows}, ${U}px)`;
     layer.textContent = '';
@@ -74,6 +135,8 @@
         }
       }
     }
+
+    setTarget(); // 高さが変わった直後も、今のスクロール位置に合わせておく
   }
 
   build();
@@ -87,19 +150,6 @@
     }, 200);
   });
 
-  // 写真のパララックス
-  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    let ticking = false;
-    window.addEventListener('scroll', () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(() => {
-        const y = window.scrollY;
-        if (y < hero.offsetHeight * 1.2) {
-          photo.style.transform = `translate3d(0, ${(y * PARALLAX_SPEED).toFixed(1)}px, 0)`;
-        }
-        ticking = false;
-      });
-    }, { passive: true });
-  }
+  // グリッド＋すりガラス層だけをパララックスで動かす（写真は固定のまま）
+  window.addEventListener('scroll', setTarget, { passive: true });
 })();

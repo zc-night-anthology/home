@@ -29,6 +29,13 @@
     menu.inert = !next;
     background.forEach((el) => { el.inert = next; });
 
+    // Lenis（スムーススクロール）はCSSのoverflow:hiddenだけでは止まらず、
+    // メニューの開閉中に裏でスクロール位置がずれてしまうため、明示的に止める／再開する
+    if (window.lenis) {
+      if (next) window.lenis.stop();
+      else window.lenis.start();
+    }
+
     if (next) {
       requestAnimationFrame(() => {
         const first = menu.querySelector('a');

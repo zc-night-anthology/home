@@ -1,7 +1,15 @@
 /* ===== サイトメニュー（ヘッダー + 全画面オーバーレイ）=====
-   MENUボタンを押すと、ヒーローの中央に横に光る線が一瞬入り、
-   そこを境に上半分・下半分がそれぞれ上下へスライドして開く。
-   閉じるときは逆に、上下から中央へ戻ってくる。
+   MENUボタンを押すと、
+     1) 画面中央をグリッドと同じ色の細い線が右→左に走り抜け、
+     2) それを境に、少し明るい紺色のシャッターが画面外まで開き、
+        中の（少し暗い紺色の）背景と項目が現れる。
+     3) 項目（文字）が下から立ち上がる。
+   閉じるときはその逆再生：
+     1) 後から立ち上がった項目ほど先に沈み、
+     2) 明るい紺色のシャッターが中央へ向かって閉じ、
+     3) 閉じ切ってから、同じ色の線が今度は左→右に走り抜け、
+     4) 最後にメニュー全体がそのままフェードアウトする。
+   「動きを減らす」設定では、スライドと線のアニメーションをやめ、フェードのみにする。
    ブレークポイントは style.css と同じ（699px / 1023px） */
 
 /* --- ヘッダー（常に固定） --- */
@@ -25,7 +33,8 @@
 .site-header__logo {
   color: inherit;
   text-decoration: none;
-  font-weight: 700;
+  font-family: "Cormorant Garamond", "Yu Gothic", "Hiragino Sans", sans-serif;
+  font-weight: 400;
   letter-spacing: 0.06em;
   font-size: clamp(13px, 1.2vw, 16px);
   text-shadow: 0 1px 12px rgba(0, 0, 0, 0.35);
@@ -50,9 +59,10 @@
   display: block;
   height: 1.2em;
   overflow: hidden;
+  font-family: "Cormorant Garamond", "Yu Gothic", "Hiragino Sans", sans-serif;
   font-size: 13px;
   line-height: 1.2;
-  font-weight: 700;
+  font-weight: 400;
   letter-spacing: 0.16em;
 }
 .toggle__roll {
@@ -89,8 +99,8 @@
   visibility: hidden;
   pointer-events: none;
   opacity: 0;
-  /* 閉じるとき：シャッターが閉じ切ってから（0.7s後）、0.3sかけて全体をフェードアウトする */
-  transition: opacity 0.3s ease-out 0.7s, visibility 0s linear 1s;
+  /* 閉じるとき：項目が沈み、シャッターが閉じ、線が走り抜けてから、全体をフェードアウトする */
+  transition: opacity 0.3s ease 1.15s, visibility 0s linear 1.45s;
 }
 .is-menu-open .site-menu {
   visibility: visible;
@@ -99,57 +109,12 @@
   transition: opacity 0s linear 0s, visibility 0s linear 0s; /* 開くときは即座に表示する */
 }
 
-/* メニュー本体（中身は最初から存在し、上下のシャッターに隠れている） */
-.site-menu__panel {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  background: #1B2A38;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-}
-
-/* 上下のシャッター：中央で合わさった状態から、開くときに上下へスライドして退く */
-.site-menu__shutter {
-  position: absolute;
-  left: 0; right: 0;
-  height: 50%;
-  z-index: 3;
-  background: #1B2A38;
-  transition: transform 0.7s cubic-bezier(0.76, 0, 0.24, 1);
-  will-change: transform;
-}
-.site-menu__shutter--top    { top: 0; }
-.site-menu__shutter--bottom { bottom: 0; }
-.is-menu-open .site-menu__shutter--top {
-  transform: translateY(-100%);
-  transition-delay: 0.3s; /* 中央を横切るスライスを先に見せてから開く */
-}
-.is-menu-open .site-menu__shutter--bottom {
-  transform: translateY(100%);
-  transition-delay: 0.3s;
-}
-
-/* 中央を横切る「スライス」：開くときは右→左、閉じるときはその逆再生で左→右に進む。
-   同じ transform を、開始位置・終了位置を入れ替えて逆方向に走らせているだけなので、
-   閉じる動きは開く動きの正確な逆再生になる。 */
-.site-menu__slice {
-  position: absolute;
-  left: 0; right: 0; top: 50%;
-  height: 1px; /* 背景の格子線と同じ太さ */
-  z-index: 4;
-  pointer-events: none;
-  background: rgba(190, 205, 218, 0.3); /* 背景の格子線と同じ色 */
-  transform: translateY(-50%) translateX(120%); /* 閉じている間・閉じたあとは画面の右外（動きなし） */
-  transition: none; /* 閉じるときは動かさない */
-}
-.is-menu-open .site-menu__slice {
-  transform: translateY(-50%) translateX(-120%); /* 開いたら画面の左外まで走り抜ける */
-  transition: transform 0.35s cubic-bezier(0.65, 0, 0.35, 1) 0s; /* 開くとき：即座に右→左へ走る */
-}
-
+/* 中身（項目・コピーライトなど）。紺一色の背景を敷いておき、
+   シャッターが開くとこの面と項目が現れる（下のページは見せない） */
 .site-menu__inner {
   position: relative;
+  z-index: 1;
+  background: #1A2140;
   min-height: 100%;
   display: grid;
   grid-template-columns: 1.7fr 1fr;
@@ -163,41 +128,112 @@
   color: #F7F6EE;
 }
 
+/* --- 上下のシャッター：閉じているときは中央で貼り合わさって全体を覆い、
+   開くときは中央を境に画面外まで退く。
+   奥の .site-menu__inner（#1A2140）よりも少し明るい色にして、
+   開いたときに色が変わって見える＝動きが分かるようにしている --- */
+.site-menu__shutter {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: #333F78;
+  z-index: 2;
+  transform: translateY(0);
+  /* 閉じる：項目が沈み切ってから中央へ */
+  transition: transform 0.5s cubic-bezier(0.65, 0, 0.35, 1) 0.4s;
+  will-change: transform;
+}
+.site-menu__shutter--top { top: 0; }
+.site-menu__shutter--bottom { bottom: 0; }
+.is-menu-open .site-menu__shutter--top { transform: translateY(-100%); }
+.is-menu-open .site-menu__shutter--bottom { transform: translateY(100%); }
+.is-menu-open .site-menu__shutter {
+  /* 開く：中央の線が走り抜けた直後に */
+  transition: transform 0.55s cubic-bezier(0.76, 0, 0.24, 1) 0.3s;
+}
+
+/* --- 中央の線（グリッドと同じ色）：開くとき、右→左に走り抜ける --- */
+.site-menu__slice {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: rgba(200, 205, 235, 0.85);
+  z-index: 3;
+  transform: translateY(-50%) scaleX(0);
+  transform-origin: right center;
+  opacity: 1;
+  transition: transform 0.3s cubic-bezier(0.65, 0, 0.35, 1), opacity 0.15s ease 0.3s;
+  will-change: transform, opacity;
+}
+.is-menu-open .site-menu__slice {
+  transform: translateY(-50%) scaleX(1);
+  opacity: 0; /* 走り抜けたら、シャッターが開く前に消える */
+  transition: transform 0.3s cubic-bezier(0.65, 0, 0.35, 1) 0s, opacity 0.15s ease 0.3s;
+}
+
+/* --- 中央の線（閉じる用）：シャッターが閉じ切る少し前から、左→右に走り抜ける --- */
+.site-menu__slice--close {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: rgba(200, 205, 235, 0.85);
+  z-index: 3;
+  transform: translateY(-50%) scaleX(1);
+  transform-origin: left center;
+  opacity: 1;
+  /* シャッターが閉じ切る（0.9s）少し前、0.85s の時点で走り抜ける動きを始める */
+  transition: transform 0.3s cubic-bezier(0.65, 0, 0.35, 1) 0.85s, opacity 0s linear 0.85s;
+  will-change: transform, opacity;
+}
+.is-menu-open .site-menu__slice--close {
+  transform: translateY(-50%) scaleX(0);
+  opacity: 0;
+  transition: none; /* 開いている間・開いた直後は常に非表示（次に閉じるときのためにリセット） */
+}
+
 /* --- メニュー項目：下から立ち上がる（ジャンプ率高め：見出しは大きく、日本語補足は小さく） --- */
 .site-menu__list { list-style: none; margin: 0; padding: 0; align-self: center; }
 .site-menu__list a {
   display: flex;
   align-items: baseline;
   gap: 1.3em;
-  padding: 0.05em 0;
+  padding: 0.4em 0; /* タップしやすいよう上下に余白を持たせる */
   color: inherit;
   text-decoration: none;
   transition: opacity 0.3s;
 }
-.site-menu__mask { display: block; overflow: hidden; }
+.site-menu__mask { display: block; }
 .site-menu__label {
   display: block;
-  font-size: clamp(52px, 11vw, 176px);
-  font-weight: 700;
+  font-family: "Cormorant Garamond", "Yu Gothic", "Hiragino Sans", sans-serif;
+  font-size: clamp(26px, 5.5vw, 88px);
+  font-weight: 400;
   line-height: 1.1;
   letter-spacing: 0.01em;
-  transform: translateY(110%);
-  /* 閉じるとき：--ri（逆順の番号）が小さいほど早く隠れる＝後から立ち上がった項目ほど先に沈む */
-  transition: transform 0.35s cubic-bezier(0.76, 0, 0.24, 1) calc(var(--ri, 0) * 0.06s);
+  opacity: 0;
+  transform: translateY(40px);
+  /* 閉じるとき：--ri（逆順の番号）が小さいほど早く沈む＝後から現れた項目ほど先に消える */
+  transition: opacity 0.3s ease calc(var(--ri, 0) * 0.04s), transform 0.3s cubic-bezier(0.76, 0, 0.24, 1) calc(var(--ri, 0) * 0.04s);
 }
 .is-menu-open .site-menu__label {
-  transform: none;
-  transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) calc(0.5s + var(--i, 0) * 0.07s);
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1) calc(0.55s + var(--i, 0) * 0.08s), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) calc(0.55s + var(--i, 0) * 0.08s);
 }
 .site-menu__ja {
   font-size: clamp(9px, 0.85vw, 11px);
   letter-spacing: 0.12em;
   opacity: 0;
-  transition: opacity 0.25s calc(var(--ri, 0) * 0.06s);
+  transition: opacity 0.25s calc(var(--ri, 0) * 0.04s);
 }
 .is-menu-open .site-menu__ja {
   opacity: 0.55;
-  transition: opacity 0.6s calc(0.8s + var(--i, 0) * 0.07s);
+  transition: opacity 0.6s calc(0.6s + var(--i, 0) * 0.08s);
 }
 /* ホバー中の項目以外を薄くする */
 @media (hover: hover) {
@@ -244,25 +280,29 @@ html.is-menu-open body { overflow: hidden; }
 /* ===== ブレークポイント ===== */
 @media (max-width: 699px) {
   .site-menu__inner { grid-template-columns: 1fr; grid-template-rows: 1fr auto auto; }
-  .site-menu__label { font-size: clamp(40px, 15vw, 72px); }
-  .site-menu__list a { gap: 0.9em; }
+  .site-menu__label { font-size: clamp(28px, 8.5vw, 40px); }
+  .site-menu__list a { gap: 0.9em; padding: 0.55em 0; }
   .site-menu__aside { align-self: start; }
 }
 /* 高さが足りない画面（スマホ横向きなど） */
 @media (max-height: 520px) and (orientation: landscape) {
   .site-menu__inner { padding-top: calc(72px + env(safe-area-inset-top, 0px)); }
-  .site-menu__label { font-size: clamp(28px, 9vh, 52px); }
+  .site-menu__label { font-size: clamp(14px, 4.5vh, 26px); }
   .site-menu__share { margin-bottom: 0.8em; }
 }
 
-/* 動きを減らす設定：スライドやフラッシュをやめ、フェードだけにする */
+/* 動きを減らす設定：スライドや線のアニメーションをやめ、フェードだけにする */
 @media (prefers-reduced-motion: reduce) {
-  .site-menu { transition-delay: 0.25s; }
-  .is-menu-open .site-menu { transition-delay: 0s; }
-  .site-menu__shutter, .site-menu__slice { display: none; }
-  .site-menu__panel { opacity: 0; transition: opacity 0.2s linear; }
-  .is-menu-open .site-menu__panel { opacity: 1; }
-  .site-menu__label, .is-menu-open .site-menu__label { transform: none; transition: none; }
+  .site-menu {
+    opacity: 0;
+    transition: opacity 0.2s linear, visibility 0s linear 0.2s;
+  }
+  .is-menu-open .site-menu {
+    opacity: 1;
+    transition: opacity 0.2s linear 0s, visibility 0s linear 0s;
+  }
+  .site-menu__slice, .site-menu__slice--close, .site-menu__shutter { display: none; }
+  .site-menu__label, .is-menu-open .site-menu__label { opacity: 1; transform: none; transition: none; }
   .site-menu__ja, .is-menu-open .site-menu__ja { opacity: 0.65; transition: none; }
   .toggle__roll, .toggle__icon i { transition: none; }
 }

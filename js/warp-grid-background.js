@@ -23,7 +23,7 @@ const CONFIG = {
   startScreens: 2,     // 何画面分(vh)歪ませずに平らなままにするか
   sub: 7,              // 1マスあたりの分割数(線の滑らかさ)
   noiseFeatureSize: 282, // 歪みの向きのうねりの大きさ(px)。マス目のサイズに合わせて調整
-  lineColor: 'rgba(190, 205, 218, 0.2)', // 格子線の色
+  lineColor: 'rgba(200, 205, 235, 0.2)', // 格子線の色
 
   // --- 背景のノイズグラデーション ---
   bgCellSize: 6,        // 背景を塗る際の粗さ(小さいほど精細だが重い)
@@ -34,11 +34,12 @@ const CONFIG = {
   grainAlpha: 0.05,     // 粒状グレインの強さ
 
   // パレット: [R, G, B] の配列。targetShare の合計は 1.0 になるようにする
+  // キービジュアル（告知画像）の色味に合わせた、少し紫がかった濃いインディゴブルー
   palette: [
-    { rgb: [0x1B, 0x2A, 0x38], share: 0.57 }, // 最も暗い濃紺
-    { rgb: [0x2A, 0x42, 0x58], share: 0.27 }, // ダークスチールブルー
-    { rgb: [0x3D, 0x5C, 0x72], share: 0.13 }, // 中間の青
-    { rgb: [0x64, 0x85, 0x9B], share: 0.03 }, // 明るい青(控えめ)
+    { rgb: [0x1A, 0x21, 0x40], share: 0.55 }, // 最も暗い濃紺(インディゴ)
+    { rgb: [0x26, 0x2F, 0x5C], share: 0.28 }, // ダークインディゴブルー
+    { rgb: [0x48, 0x56, 0x8F], share: 0.14 }, // 中間の青紫
+    { rgb: [0x7C, 0x8F, 0xC9], share: 0.03 }, // 明るい青紫(控えめ)
   ],
 };
 
@@ -248,10 +249,22 @@ function initWarpGridBackground() {
   const bgCtx = bgCanvas.getContext('2d');
   const ctx = gridCanvas.getContext('2d');
 
+  // ページ全体の高さは document.documentElement.scrollHeight ではなく、
+  // .content（このキャンバス自身とは無関係な、通常フローの要素）の下端から求める。
+  // scrollHeight を使うと「絶対配置のキャンバス自身の高さ」も測定対象に含まれてしまい、
+  // 一度キャンバスが実際より少し高く描画されると、以降は常にキャンバス自身の高さを
+  // 測り続けてしまって縮まらなくなる（＝フッターの下に謎の余白が残り続ける）ため。
+  function getPageHeight() {
+    const contentEl = document.querySelector('.content');
+    if (!contentEl) return document.documentElement.scrollHeight;
+    const rect = contentEl.getBoundingClientRect();
+    return Math.ceil(rect.bottom + window.scrollY);
+  }
+
   function redraw() {
     applyWarpBreakpoint();
     const w = window.innerWidth;
-    const h = document.documentElement.scrollHeight;
+    const h = getPageHeight();
     const vh = window.innerHeight;
     drawBackground(bgCanvas, bgCtx, w, h);
     drawGrid(gridCanvas, ctx, w, h, vh);
@@ -272,15 +285,25 @@ function initWarpGridBackground() {
   });
 
   // ページ内容が動的に増減する場合に備えて、高さの変化も監視
-  let lastHeight = document.documentElement.scrollHeight;
+  let lastHeight = getPageHeight();
   const resizeObserver = new ResizeObserver(() => {
-    const newHeight = document.documentElement.scrollHeight;
+    const newHeight = getPageHeight();
     if (Math.abs(newHeight - lastHeight) > 10) {
       lastHeight = newHeight;
       redraw();
     }
   });
   resizeObserver.observe(document.body);
+
+  // Webフォントの読み込みが初回描画より後に完了し、文字の高さが変わって
+  // 実際のページ内容よりキャンバスが長いまま残る（＝フッターの下に余白ができる）
+  // ことがあるため、フォント確定後にもう一度サイズを合わせ直す
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => {
+      lastHeight = getPageHeight();
+      redraw();
+    });
+  }
 }
 
 if (document.readyState === 'loading') {

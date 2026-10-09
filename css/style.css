@@ -19,6 +19,7 @@ html { scroll-padding-top: 72px; }
    ページと一緒にスクロールさせるため absolute にする（fixed だと歪みが見えない） */
 #warp-bg-base,
 #warp-grid-bg {
+  max-width: 100%;
   position: absolute;
   top: 0;
   left: 0;
@@ -679,3 +680,9 @@ html.is-loading { overflow: hidden; }
 /* ===== 見出しの色：オレンジと青を交互に（NEWS → ABOUT → MEMBER → BOOKS の順） ===== */
 #news h2, #member h2 { color: #F5F6FA; }
 #about h2, #books h2 { color: #F5F6FA; }
+
+/* ===== 折り返しの崩れ防止（スマホ） ===== */
+.nowrap { white-space: nowrap; }
+.section-grid__body > p { word-break: auto-phrase; text-wrap: pretty; overflow-wrap: anywhere; }
+.site-footer, .site-credit { overflow-wrap: anywhere; }
+.site-credit__list dt, .site-credit__list dd { min-width: 0; }

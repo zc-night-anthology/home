@@ -269,7 +269,8 @@ function initWarpGridBackground() {
 
   function redraw() {
     applyWarpBreakpoint();
-    const w = window.innerWidth;
+    // 幅は「画面からはみ出さない」値にする（devtools のレスポンシブ表示などで innerWidth が実際の幅より広く残ることがある）
+    const w = Math.min(window.innerWidth, document.documentElement.clientWidth || window.innerWidth);
     const h = getPageHeight();
     const vh = window.innerHeight;
     drawBackground(bgCanvas, bgCtx, w, h);
@@ -280,12 +281,13 @@ function initWarpGridBackground() {
 
   // リサイズ時は再計算(デバウンス)。幅が変わらない場合（スマホのアドレスバー伸縮など）は再描画しない
   let resizeTimer;
-  let lastWidth = window.innerWidth;
+  let lastWidth = Math.min(window.innerWidth, document.documentElement.clientWidth || window.innerWidth);
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
-      if (window.innerWidth === lastWidth) return;
-      lastWidth = window.innerWidth;
+      const cw = Math.min(window.innerWidth, document.documentElement.clientWidth || window.innerWidth);
+      if (cw === lastWidth) return;
+      lastWidth = cw;
       redraw();
     }, 150);
   });

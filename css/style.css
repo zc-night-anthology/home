@@ -63,6 +63,15 @@ html { scroll-padding-top: 72px; }
   -webkit-backdrop-filter: blur(28px) saturate(1.15);
   backdrop-filter: blur(28px) saturate(1.15);
 }
+/* すりガラスの端（ヒーローの縁）では、ぼかしの計算が途中で途切れて下の絵がくっきり透けるため、
+   縁にすりガラスと同じ色のやわらかいふちどりを重ねて隠す */
+.hero__glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 56px 24px rgba(118, 124, 160, 0.9);
+}
 /* すりガラスのざらつき（細かい粒状ノイズ） */
 .hero__glass::after {
   content: "";
@@ -686,3 +695,11 @@ html.is-loading { overflow: hidden; }
 .section-grid__body > p { word-break: auto-phrase; text-wrap: pretty; overflow-wrap: anywhere; }
 .site-footer, .site-credit { overflow-wrap: anywhere; }
 .site-credit__list dt, .site-credit__list dd { min-width: 0; }
+
+/* ===== タッチ端末（iPhone等）：すりガラスの負荷を下げてスクロール時のちらつきを防ぐ ===== */
+@media (hover: none) and (pointer: coarse) {
+  .hero__glass { -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); }
+  .hero__glass::before { display: none; }
+  .hero__glass::after { mix-blend-mode: normal; opacity: 0.12; }
+  .hero__photo { will-change: auto; }
+}

@@ -29,6 +29,7 @@
   const MOBILE_WIDTH     = 700;             // これ未満をモバイル扱い
   const PARALLAX_RANGE   = 1.0;             // ヒーロー高さの何倍スクロールするまでズームさせるか
   const PARALLAX_EASE    = 0.07;            // 目標値への近づき方（小さいほどゆっくり・滑らか）
+  const LIGHT = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
   const PHOTO_ZOOM       = 0.2;             // 写真がヒーロー内で最大どれだけ拡大するか（0.2 = 120%。視差効果程度のわずかな動き）
 
   // くっきり見せる「窓」を、読み込みごとにランダムに決める。
@@ -98,6 +99,8 @@
     const t = maxY > 0 ? Math.min(y / maxY, 1) : 0; // 0〜1の進み具合
 
     // 写真：中心を軸に大きくズーム
+    // タッチ端末（iPhone等）は、ぼかしの再計算がスクロールのたびに走ってちらつくため、拡大を止める
+    if (LIGHT) return;
     photo.style.transform = `scale(${(1 + t * PHOTO_ZOOM).toFixed(4)})`;
 
     // すりガラス・格子線：視差効果なし（固定表示のため、ここでは何もしない）

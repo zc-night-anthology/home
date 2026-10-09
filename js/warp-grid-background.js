@@ -17,13 +17,13 @@
 
 const CONFIG = {
   // --- グリッドの歪み ---
-  spacing: 96,         // 格子の間隔(px)
+  spacing: 44,         // 格子の間隔(px)
   maxAmp: 108,         // 歪みの最大幅(px)。マス目のサイズに合わせて調整
   growth: 0.04,        // 歪みが強まっていく速さ(開始位置からの距離に対する係数)
   startScreens: 2,     // 何画面分(vh)歪ませずに平らなままにするか
   sub: 7,              // 1マスあたりの分割数(線の滑らかさ)
   noiseFeatureSize: 282, // 歪みの向きのうねりの大きさ(px)。マス目のサイズに合わせて調整
-  lineColor: 'rgba(200, 205, 235, 0.2)', // 格子線の色
+  lineColor: 'rgba(200, 205, 235, 0.1)', // 格子線の色
 
   // --- 背景のノイズグラデーション ---
   bgCellSize: 6,        // 背景を塗る際の粗さ(小さいほど精細だが重い)
@@ -47,8 +47,8 @@ const CONFIG = {
 // 上記 CONFIG の値が PC 用。狭い画面では、格子・歪み幅・ノイズの大きさを小さくする。
 // （デスクトップ側を1.2倍にしたのに合わせて、こちらも同じ比率で拡大してある）
 const WARP_BREAKPOINTS = [
-  { maxWidth: 699,  spacing: 58,  maxAmp: 54, noiseFeatureSize: 180, bgCellSize: 8 }, // スマホ
-  { maxWidth: 1023, spacing: 77,  maxAmp: 84, noiseFeatureSize: 240, bgCellSize: 6 }, // タブレット
+  { maxWidth: 699,  spacing: 26,  maxAmp: 54, noiseFeatureSize: 180, bgCellSize: 8 }, // スマホ
+  { maxWidth: 1023, spacing: 35,  maxAmp: 84, noiseFeatureSize: 240, bgCellSize: 6 }, // タブレット
 ];
 const WARP_DESKTOP = {
   spacing: CONFIG.spacing, maxAmp: CONFIG.maxAmp,
@@ -174,10 +174,15 @@ function drawGrid(gridCanvas, ctx, w, h, vh) {
   function noiseDX(x, y) { return valueNoise(x * freq, y * freq); }
   function noiseDY(x, y) { return valueNoise(x * freq + 41.3, y * freq + 97.1); }
 
+  // 歪みは ABOUT セクションの上端あたりからスタートする（見つからなければ従来どおり startScreens 画面ぶん下から）
+  const aboutEl = document.getElementById('about');
+  const warpStartY = aboutEl ? aboutEl.getBoundingClientRect().top + window.scrollY : vh * startScreens;
+
   function ampAt(y) {
-    const startY = vh * startScreens;
+    const startY = warpStartY;
     if (y <= startY) return 0;
-    return Math.min(maxAmp, (y - startY) * growth);
+    // 歪みは平らな区間の終わりから、ページの一番下（フッター付近）で最大になるよう直線的に強める
+    return maxAmp * Math.min(1, (y - startY) / Math.max(1, h - startY));
   }
 
   function disp(x, y) {
@@ -195,6 +200,7 @@ function drawGrid(gridCanvas, ctx, w, h, vh) {
   ctx.rect(0, 0, w, h);
   ctx.clip();
 
+  ctx.translate(0.5, 0.5); // 1px線をピクセルにぴったり重ねる（heroの白線と同じ位置）
   ctx.strokeStyle = lineColor;
   ctx.lineWidth = 1;
 

@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>引き合う、あわいの夜のふち</title>
-  <meta name="description" content="『引き合う、あわいの夜のふち』はZhongli×Tartagliaのオンリーアンソロジーです。">
+  <title>Drawn — Liminal Night</title>
+  <meta name="description" content="『Drawn — Liminal Night』はZhongli×Tartagliaのオンリーアンソロジーです。">
   <meta name="theme-color" content="#1A2140">
 
   <!-- 検索エンジン避け：公開して検索に載せたいときは、この1行を削除（GitHub PagesはX-Robots-Tagヘッダーを付けられないためmetaのみ） -->
@@ -13,41 +13,45 @@
 
   <!-- ファビコン -->
   <link rel="icon" href="favicon.ico" sizes="48x48">
-  <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="images/favicon-32.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
 
   <!-- SNSカード（OGP / X） -->
   <meta property="og:type" content="website">
   <meta property="og:locale" content="ja_JP">
-  <meta property="og:site_name" content="引き合う、あわいの夜のふち">
-  <meta property="og:title" content="引き合う、あわいの夜のふち">
-  <meta property="og:description" content="『引き合う、あわいの夜のふち』はZhongli×Tartagliaのオンリーアンソロジーです。">
+  <meta property="og:site_name" content="Drawn — Liminal Night">
+  <meta property="og:title" content="Drawn — Liminal Night">
+  <meta property="og:description" content="『Drawn — Liminal Night』はZhongli×Tartagliaのオンリーアンソロジーです。">
   <meta property="og:url" content="https://www.zc-night-anthology.jp/">
   <meta property="og:image" content="https://www.zc-night-anthology.jp/images/ogp.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="ページのイメージ画像">
+  <meta property="og:image:alt" content="Drawn — Liminal Night">
   <meta name="twitter:card" content="summary_large_image">
   <!-- <meta name="twitter:site" content="@アカウント名"> -->
-  <meta name="twitter:title" content="引き合う、あわいの夜のふち">
-  <meta name="twitter:description" content="『引き合う、あわいの夜のふち』はZhongli×Tartagliaのオンリーアンソロジーです。">
+  <meta name="twitter:title" content="Drawn — Liminal Night">
+  <meta name="twitter:description" content="『Drawn — Liminal Night』はZhongli×Tartagliaのオンリーアンソロジーです。">
   <meta name="twitter:image" content="https://www.zc-night-anthology.jp/images/ogp.png">
-  <meta name="twitter:image:alt" content="ページのイメージ画像">
+  <meta name="twitter:image:alt" content="Drawn — Liminal Night">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;700&family=Cormorant+Garamond:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=52">
-  <link rel="stylesheet" href="css/nav.css?v=52">
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;700&family=Cormorant+Garamond:wght@400;600;700&family=Jost:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=121">
+  <link rel="stylesheet" href="css/nav.css?v=121">
 </head>
 
 <body>
+
+  <div class="loader" id="loader" aria-hidden="true">
+    <img class="loader__logo" src="images/loader-logo.png" alt="" width="1500" height="346">
+  </div>
 
   <canvas id="warp-bg-base"></canvas>
   <canvas id="warp-grid-bg"></canvas>
 
   <header class="site-header">
-    <a class="site-header__logo" href="./">ZC NIGHT ANTHOLOGY</a>
+    <a class="site-header__logo" href="./" aria-label="Drawn — Liminal Night"><img src="images/logo-w.png" alt="Drawn — Liminal Night" width="1000" height="230"></a>
     <button type="button" class="site-header__toggle" id="menu-toggle" aria-expanded="false" aria-controls="site-menu"
       aria-label="メニューを開く">
       <span class="toggle__text" aria-hidden="true"><span
@@ -63,48 +67,58 @@
     <div class="site-menu__shutter site-menu__shutter--bottom" aria-hidden="true"></div>
     <div class="site-menu__inner">
       <ul class="site-menu__list">
-        <li><a href="#about"><span class="site-menu__mask"><span class="site-menu__label"
-                style="--i:0;--ri:3">ABOUT</span></span><span class="site-menu__ja"
-              style="--i:0;--ri:3">このアンソロジーについて</span></a></li>
-        <li><a href="#member"><span class="site-menu__mask"><span class="site-menu__label"
-                style="--i:1;--ri:2">MEMBER</span></span><span class="site-menu__ja"
-              style="--i:1;--ri:2">参加メンバー</span></a></li>
-        <li><a href="#books"><span class="site-menu__mask"><span class="site-menu__label"
-                style="--i:2;--ri:1">BOOKS</span></span><span class="site-menu__ja"
-              style="--i:2;--ri:1">仕様</span></a></li>
         <li><a href="#news"><span class="site-menu__mask"><span class="site-menu__label"
-                style="--i:3;--ri:0">NEWS</span></span><span class="site-menu__ja"
-              style="--i:3;--ri:0">お知らせ</span></a></li>
+                style="--i:0;--ri:3">NEWS</span></span><span class="site-menu__ja"
+              style="--i:0;--ri:3">お知らせ</span></a></li>
+        <li><a href="#about"><span class="site-menu__mask"><span class="site-menu__label"
+                style="--i:1;--ri:2">ABOUT</span></span><span class="site-menu__ja"
+              style="--i:1;--ri:2">概要</span></a></li>
+        <li><a href="#member"><span class="site-menu__mask"><span class="site-menu__label"
+                style="--i:2;--ri:1">MEMBER</span></span><span class="site-menu__ja"
+              style="--i:2;--ri:1">参加メンバー</span></a></li>
+        <li><a href="#books"><span class="site-menu__mask"><span class="site-menu__label"
+                style="--i:3;--ri:0">BOOKS</span></span><span class="site-menu__ja"
+              style="--i:3;--ri:0">仕様</span></a></li>
       </ul>
-      <div class="site-menu__aside">
-        <!-- シェアリンク（公開URLが決まったらコメントを外し、URLを置き換える）
-        <ul class="site-menu__share">
-          <li><a href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fwww.zc-night-anthology.jp%2F" target="_blank" rel="noopener noreferrer">X</a></li>
-        </ul>
-        -->
-      </div>
-      <p class="site-menu__copy">&copy; 2026 引き合う、あわいの夜のふち</p>
     </div>
   </nav>
 
   <section class="hero" id="hero">
+    <canvas class="hero__bg" id="hero-bg" aria-hidden="true"></canvas>
     <div class="hero__photo" id="hero-photo"></div>
     <div class="hero__glass" id="hero-glass" aria-hidden="true"></div>
     <div class="hero__lines" id="hero-lines" aria-hidden="true"></div>
-    <div class="hero__title">
-      <h1>光をすかす、<br>格子のむこう。</h1>
-      <p>引き合う、あわいの夜のふち</p>
-    </div>
+    <p class="hero__side hero__side--left" aria-hidden="true">Zhongli × Tartaglia Anthology</p>
+    <a class="hero__sns" href="https://x.com/ZC_night_anthol" target="_blank" rel="noopener noreferrer" aria-label="公式X（旧Twitter）を開く"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+    <a class="hero__scroll" href="#news" aria-label="下へスクロール"><span class="hero__scroll-text">scroll</span><span class="hero__scroll-line" aria-hidden="true"></span></a>
   </section>
 
   <main class="content">
 
-    <!-- ===== ABOUT ===== -->
-    <section id="about">
+    <!-- ===== NEWS ===== -->
+    <section id="news">
       <div class="section-grid">
         <div class="section-grid__head reveal">
-          <span class="section-label">01</span>
+          <h2>NEWS</h2>
+          <p class="section-sub">お知らせ</p>
+        </div>
+        <div class="section-grid__body reveal" style="--reveal-delay: 0.15s">
+          <ul class="news-list">
+            <li>
+              <time datetime="2026-10-10">2026.10.10</time>
+              <p>ティザーサイトを公開しました</p>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== ABOUT ===== -->
+    <section id="about">
+      <div class="section-grid section-grid--stack">
+        <div class="section-grid__head reveal">
           <h2>ABOUT</h2>
+          <p class="section-sub">概要</p>
         </div>
         <div class="section-grid__body reveal" style="--reveal-delay: 0.15s">
           <p>当サイトは2027年5月3日SUPER COMIC CITY 2027 で発行予定の鍾タル非公式二次創作アンソロジー<br>
@@ -114,12 +128,14 @@
       </div>
     </section>
 
+    <div class="duo">
     <!-- ===== MEMBER ===== -->
     <section id="member">
-      <div class="section-grid">
+      <div class="section-grid section-grid--duo">
         <div class="section-grid__head reveal">
-          <span class="section-label">02</span>
           <h2>MEMBER</h2>
+          <p class="section-sub">参加メンバー</p>
+          <p class="section-note">※敬称略/50音順</p>
         </div>
         <div class="section-grid__body reveal" style="--reveal-delay: 0.15s">
           <div class="member-columns member-columns--top">
@@ -170,66 +186,66 @@
                 <a class="member-card__x" href="https://x.com/mixxxx9" target="_blank" rel="noopener noreferrer" aria-label="ミックスのXプロフィールを見る"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
               </li>
             </ul>
+            <ul class="member-grid member-grid--comic member-grid--organizer">
+              <li class="member-card">
+                <p class="member-card__name"><span class="member-card__sparkle" aria-hidden="true"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" focusable="false"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg></span>a(主催)</p>
+                <a class="member-card__x" href="https://x.com/d_112115" target="_blank" rel="noopener noreferrer" aria-label="a(主催)のXプロフィールを見る"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
     </section>
 
     <!-- ===== BOOKS ===== -->
-    <section id="product">
-      <div class="section-grid section-grid--center">
+    <section id="books">
+      <div class="section-grid section-grid--duo">
         <div class="section-grid__head reveal">
-          <span class="section-label">03</span>
           <h2>BOOKS</h2>
+          <p class="section-sub">仕様</p>
+          <p class="section-note" aria-hidden="true">&nbsp;</p>
         </div>
         <div class="section-grid__body reveal" style="--reveal-delay: 0.15s">
           <dl class="spec-list">
-            <div class="spec-list__row"><dt>タイトル</dt><dd>Drawn — Liminal Night</dd></div>
-            <div class="spec-list__row"><dt>CP</dt><dd>鍾離×タルタリヤ</dd></div>
-            <div class="spec-list__row"><dt>内容</dt><dd>イラスト・漫画・小説 混合／全年齢</dd></div>
-            <div class="spec-list__row"><dt>判型</dt><dd>A5</dd></div>
-            <div class="spec-list__row"><dt>ページ数</dt><dd>調整中</dd></div>
-            <div class="spec-list__row"><dt>頒布予定</dt><dd>2027年5月3日 SUPER COMIC CITY 33 day1</dd></div>
+            <div class="spec-list__row"><dt><span class="spec-list__sparkle" aria-hidden="true"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" focusable="false"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg></span>タイトル</dt><dd>Drawn — Liminal Night（引き合う、あわいの夜のふち）</dd></div>
+            <div class="spec-list__row"><dt><span class="spec-list__sparkle" aria-hidden="true"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" focusable="false"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg></span>CP</dt><dd>鍾離×タルタリヤ</dd></div>
+            <div class="spec-list__row"><dt><span class="spec-list__sparkle" aria-hidden="true"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" focusable="false"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg></span>内容</dt><dd>イラスト・漫画・小説 混合／全年齢</dd></div>
+            <div class="spec-list__row"><dt><span class="spec-list__sparkle" aria-hidden="true"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" focusable="false"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg></span>判型</dt><dd>A5</dd></div>
+            <div class="spec-list__row"><dt><span class="spec-list__sparkle" aria-hidden="true"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" focusable="false"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg></span>ページ数</dt><dd>調整中</dd></div>
+            <div class="spec-list__row"><dt><span class="spec-list__sparkle" aria-hidden="true"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" focusable="false"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg></span>頒布予定</dt><dd>2027年5月3日 SUPER COMIC CITY 33 day1</dd></div>
           </dl>
           <p class="spec-list__note">※内容は変更になる場合があります</p>
         </div>
       </div>
     </section>
-
-    <!-- ===== NEWS ===== -->
-    <section id="news">
-      <div class="section-grid">
-        <div class="section-grid__head reveal">
-          <span class="section-label">04</span>
-          <h2>NEWS</h2>
-        </div>
-        <div class="section-grid__body reveal" style="--reveal-delay: 0.15s">
-          <ul class="news-list">
-            <li>
-              <time datetime="2026-10-10">2026.10.10</time>
-              <p>ティザーサイトを公開しました</p>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </section>
+    </div>
 
   </main>
 
   <footer class="site-footer">
+    <div class="site-footer__main">
     <div class="site-footer__inner">
       <div class="site-footer__about">
-        <p class="site-footer__title">引き合う、あわいの夜のふち</p>
-        <p class="site-footer__desc">Zhongli×Tartagliaオンリーアンソロジー</p>
+        <img class="site-footer__logo" src="images/logo-square-w.png" alt="Drawn — Liminal Night" width="500" height="329">
       </div>
-      <nav class="site-footer__nav" aria-label="フッターナビゲーション">
-        <a href="#about">ABOUT</a>
-        <a href="#member">MEMBER</a>
-        <a href="#books">BOOKS</a>
-        <a href="#news">NEWS</a>
-      </nav>
+      <div class="site-footer__right">
+        <nav class="site-footer__nav" aria-label="フッターナビゲーション">
+          <a href="#news">NEWS</a>
+          <a href="#about">ABOUT</a>
+          <a href="#member">MEMBER</a>
+          <a href="#books">BOOKS</a>
+        </nav>
+
+        <div class="site-credit">
+          <h2 class="site-credit__title">CREDIT</h2>
+          <dl class="site-credit__list">
+            <div><dt>Logo Design</dt><dd>ミックス</dd></div>
+            <div><dt>Web Design &amp; Coding</dt><dd>a(主催)</dd></div>
+          </dl>
+        </div>
+      </div>
     </div>
-    <p class="site-footer__copy">&copy; 2026 引き合う、あわいの夜のふち</p>
+    </div>
   </footer>
 
   <a class="back-to-top" href="#hero" aria-label="ページの先頭に戻る">
@@ -238,13 +254,17 @@
     </svg>
   </a>
 
-  <script src="js/lenis.min.js?v=52"></script>
-  <script src="js/lenis-init.js?v=52"></script>
-  <script src="js/warp-grid-background.js?v=52"></script>
-  <script src="js/hero-glass.js?v=52"></script>
-  <script src="js/nav.js?v=52"></script>
-  <script src="js/scroll-reveal.js?v=52"></script>
-  <script src="js/footer-offset.js?v=52"></script>
+  <script src="js/loader.js?v=121"></script>
+  <script src="js/lenis.min.js?v=121"></script>
+  <script src="js/lenis-init.js?v=121"></script>
+  <script src="js/warp-grid-background.js?v=121"></script>
+  <script src="js/hero-glass.js?v=121"></script>
+  <script src="js/nav.js?v=121"></script>
+  <script src="js/scroll-reveal.js?v=121"></script>
+  <script src="js/head-width.js?v=121"></script>
+  <script src="js/header-logo.js?v=121"></script>
+  <script src="js/back-to-top.js?v=121"></script>
+  <script src="js/footer-offset.js?v=121"></script>
 </body>
 
 </html>

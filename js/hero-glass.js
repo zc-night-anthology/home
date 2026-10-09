@@ -34,52 +34,79 @@
 
   // くっきり見せる「窓」を、読み込みごとにランダムに決める。
   // ここでは 0〜1 の乱数だけを持ち、実際のマス数への変換は build() で行う（マスの間隔 U は画面幅で変わるため）
-  // 窓は大・中・小の3つ。画面を2つの帯に分け、片側の全面に「大」、反対側に「中」と「小」を不均等に並べる。
-  // 帯の分け方は縦割り（左右）・横割り（上下）のどちらもランダム。大は常に画面の端のどこかに接し、中心付近も必ず含む。
-  const HORIZONTAL = Math.random() < 0.5;         // true: 上下に分ける／false: 左右に分ける
-  const BIG_FIRST = Math.random() < 0.5;          // 大が左（上）側か、右（下）側か
-  const BIG_EDGE = Math.floor(Math.random() * 3); // 0:帯の外側の端 1:一方の長辺側 2:もう一方の長辺側
-  const MED_FIRST = Math.random() < 0.5;          // 中が前（上／左）側か後ろ側か
+  // 窓は大・中・小の3つ。
+  //  ・大：細い側の長さが画面の約4分の1。画面の中心付近を必ず含み、端に接して伸びる（縦長か横長かはランダム）
+  //  ・中・小：大の左右どちらか（縦割り＝同じ側に上下に並ぶ）か、大の両側に1つずつ（横割り）に置く。
+  // 大は中の約2.5倍の面積になるようにする
+  const HORIZONTAL = Math.random() < 0.5;         // true: 大を横長（高さが画面の約1/4、左右の端に接する）にする／false: 縦長
+  const SAME_SIDE = Math.random() < 0.5;          // true: 中と小が大の同じ側に上下に並ぶ／false: 大の両側に1つずつ
+  const BIG_FIRST = Math.random() < 0.5;          // 中（と小）が大の左側か右側か（SAME_SIDE のとき）／中が左か右か
+  const BIG_TOP = Math.random() < 0.5;            // 大が上端に接するか、下端に接するか
+  const MED_FIRST = Math.random() < 0.5;          // 中が上か下か（SAME_SIDE のとき）
   const R = () => Math.random();
-  const FILL_W = 0.85 + R() * 0.15, FILL_H = 0.85 + R() * 0.15; // 大・中の埋まり具合
-  const SMALL_W = 0.72 + R() * 0.1, SMALL_H = 0.72 + R() * 0.1; // 小さい窓は一回り小さく
-  const SEEDS = Array.from({ length: 3 }, () => ({ rx: R(), ry: R() }));
+  const BIG_H = 0.72 + R() * 0.28;                // 大の高さ（画面の高さに対する割合）
+  const BIG_SHIFT = R();                          // 大を中心に対して左右どちらへずらすか
+  const MED_W = 0.5 + R() * 0.1, MED_H = 0.78 + R() * 0.12;
+  const SML_W = 0.4 + R() * 0.1, SML_H = 0.65 + R() * 0.1;
+  const SEEDS = Array.from({ length: 4 }, () => ({ rx: R(), ry: R() }));
 
-  // 「左右に分ける」基準の配置を cols×rows で作る（上下に分けるときは縦横を入れ替えて呼び、結果を転置する）
-  function layoutBase(cols, rows) {
+  // 窓の位置・大きさを、背景グリッド（間隔 U、原点 0,0）の交点に吸着させて返す
+  // 縦長の配置を cols×rows で作る（横長のときは縦横を入れ替えて呼び、結果を転置する）
+  function layoutBase(cols, rows, fxr, fyr, extra) {
     const mc = Math.floor(cols / 2), mr = Math.floor(rows / 2);
-    const pick = (seed, xMin, xMax, yMin, yMax, fw = FILL_W, fh = FILL_H) => {
-      const sw = xMax - xMin, sh = yMax - yMin;
+    // 顔の位置（hero.png の目のあたり。横 約55%・縦 約33%）。中心と顔の両方を大の中に入れる
+    const fc = Math.round(cols * fxr), fr = Math.round(rows * fyr);
+    const cLo = Math.min(mc, fc), cHi = Math.max(mc, fc), rLo = Math.min(mr, fr), rHi = Math.max(mr, fr);
+    const pick = (seed, xMin, xMax, yMin, yMax, fw, fh) => {
+      const sw = Math.max(2, xMax - xMin), sh = Math.max(2, yMax - yMin);
       const w = Math.max(2, Math.min(sw, Math.round(sw * fw)));
       const h = Math.max(2, Math.min(sh, Math.round(sh * fh)));
       const x0 = xMin + Math.floor(seed.rx * (sw - w + 1));
       const y0 = yMin + Math.floor(seed.ry * (sh - h + 1));
       return [x0, y0, x0 + w, y0 + h];
     };
-    const bigX = BIG_FIRST ? [1, mc - 1] : [mc + 2, cols - 1];
-    const smallX = BIG_FIRST ? [mc + 2, cols - 1] : [1, mc - 2];
-    const big = pick(SEEDS[0], bigX[0], bigX[1], 1, rows - 1);
-    // 人物の顔が見えるよう、画面の中心付近は必ず大の中に入れる（中心をまたぐまで広げる）
-    big[0] = Math.min(big[0], mc - 1); big[2] = Math.max(big[2], mc + 1);
-    big[1] = Math.min(big[1], mr - 1); big[3] = Math.max(big[3], mr + 1);
-    // 大は必ず画面の端に接する（見切れる）
-    if (BIG_EDGE === 0) { if (BIG_FIRST) big[0] = 0; else big[2] = Infinity; }
-    else if (BIG_EDGE === 1) big[1] = 0;
-    else big[3] = Infinity;
-    // 反対側は「中」と「小」に不均等に分ける（中が約60%、小が約40%の帯）
-    const sr = Math.round(rows * 0.6);
-    const medY = MED_FIRST ? [1, sr - 1] : [rows - sr + 1, rows - 1];
-    const smlY = MED_FIRST ? [sr + 1, rows - 1] : [1, rows - sr - 1];
-    const med = pick(SEEDS[1], smallX[0], smallX[1], medY[0], medY[1]);
-    const sml = pick(SEEDS[2], smallX[0], smallX[1], smlY[0], smlY[1], SMALL_W, SMALL_H);
-    return [big, med, sml];
+    // 大：幅は画面幅の約1/4。中心（mc, mr）を必ず含める
+    const bw = Math.max(3, Math.round(cols / 4), cHi - cLo + 3);
+    const lo = Math.max(1, cHi + 1 - bw), hi = Math.min(cols - 1 - bw, cLo - 1);
+    const bx0 = hi >= lo ? Math.round(lo + BIG_SHIFT * (hi - lo)) : Math.max(1, Math.min(cols - 1 - bw, cLo - 1));
+    const bh = Math.max(Math.round(rows * BIG_H), rHi + 2);
+    const big = BIG_TOP ? [bx0, 0, bx0 + bw, Math.min(bh, rows - 1)] : [bx0, Math.max(1, Math.min(rows - bh, rLo - 1)), bx0 + bw, Infinity];
+    const L = [1, big[0] - 1], Rt = [big[2] + 1, cols - 1]; // 大の左側・右側の空き
+    let med, sml;
+    if (SAME_SIDE) {
+      const side = BIG_FIRST ? L : Rt;
+      const sr = Math.round(rows * 0.6);
+      const medY = MED_FIRST ? [1, sr - 1] : [rows - sr + 1, rows - 1];
+      const smlY = MED_FIRST ? [sr + 1, rows - 1] : [1, rows - sr - 1];
+      med = pick(SEEDS[1], side[0], side[1], medY[0], medY[1], MED_W + 0.15, MED_H - 0.05);
+      sml = pick(SEEDS[2], side[0], side[1], smlY[0], smlY[1], SML_W + 0.15, SML_H - 0.05);
+    } else {
+      med = pick(SEEDS[1], (BIG_FIRST ? L : Rt)[0], (BIG_FIRST ? L : Rt)[1], 1, rows - 1, MED_W, MED_H - 0.2);
+      sml = pick(SEEDS[2], (BIG_FIRST ? Rt : L)[0], (BIG_FIRST ? Rt : L)[1], 1, rows - 1, SML_W, SML_H - 0.2);
+    }
+    const cells = [big, med, sml]; // 大・中・小
+    if (extra) {
+      // スマホ用の4つ目：大の左右どちらかの空いている縦の隙間で、いちばん広いところに小さめの窓を置く
+      const f = (v, d) => (isFinite(v) ? v : d);
+      let best = null;
+      [L, Rt].forEach(side => {
+        const ys = cells.slice(1).filter(c => c[0] <= side[1] && c[2] >= side[0]).map(c => [c[1], c[3]]).sort((a, b) => a[0] - b[0]);
+        let cur = 1;
+        const gaps = [];
+        ys.forEach(([a, b]) => { if (a - 1 - cur >= 2) gaps.push([cur, a - 1]); cur = Math.max(cur, b + 1); });
+        if (rows - 1 - cur >= 2) gaps.push([cur, rows - 1]);
+        gaps.forEach(g => { if (side[1] - side[0] >= 2 && (!best || g[1] - g[0] > best.g[1] - best.g[0])) best = { side, g }; });
+      });
+      if (best) cells.push(pick(SEEDS[3], best.side[0], best.side[1], best.g[0], best.g[1], SML_W + 0.2, SML_H));
+    }
+    return cells;
   }
-  // 窓の位置・大きさを、背景グリッド（間隔 U、原点 0,0）の交点に吸着させて返す
   function layoutCells(W, H, U) {
     const cols = Math.max(8, Math.floor(W / U));
     const rows = Math.max(8, Math.floor(H / U));
-    if (!HORIZONTAL) return layoutBase(cols, rows);
-    return layoutBase(rows, cols).map(([x0, y0, x1, y1]) => [y0, x0, y1, x1]);
+    const extra = true; // 窓は4つ（大・中・小・小）
+    if (!HORIZONTAL) return layoutBase(cols, rows, 0.55, 0.33, extra);
+    return layoutBase(rows, cols, 0.33, 0.55, extra).map(([x0, y0, x1, y1]) => [y0, x0, y1, x1]);
   }
 
   // 格子の間隔は歪みグリッドと必ず同じ値にする（画面幅に応じて CONFIG.spacing が変わる）

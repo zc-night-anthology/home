@@ -284,6 +284,7 @@ html.is-menu-open body { overflow: hidden; }
 
 /* ===== ブレークポイント ===== */
 @media (max-width: 699px) {
+  .site-header__logo img { width: 140px; max-width: 140px; }
   .site-menu__inner { grid-template-columns: 1fr; grid-template-rows: 1fr auto auto; }
   .site-menu__label { font-size: clamp(36px, min(11vw, 8vh), 52px); }
   .site-menu__list a { gap: 1em; padding: 0.65em 0; }
